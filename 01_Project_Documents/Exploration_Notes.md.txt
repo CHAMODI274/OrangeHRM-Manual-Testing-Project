@@ -1,0 +1,418 @@
+# OrangeHRM Exploration Notes
+
+## General Observation
+All Delete actions across the system trigger a confirmation popup before deleting.
+
+---
+
+## 1. Dashboard
+Shows a summary landing page after login, including:
+- Time at Work
+- My Actions
+- Quick Launch
+- Buzz Latest Posts
+- Employees on Leave Today
+- Employee Distribution by Sub Unit
+- Employee Distribution by Location
+
+Purpose: Gives the logged-in user a quick overview of key HR information.
+
+---
+
+## 2. Admin
+The Admin module contains 7 tabs: User Management, Job, Organization, 
+Qualifications, Nationalities, Corporate Branding, Configuration.
+
+### 2.1 User Management
+- Lists all system users. Columns: Username, User Role, Employee Name, Status, Actions (Edit/Delete)
+- **Add User** form requires: User Role (Admin/ESS), Employee Name, Status 
+  (Enabled/Disabled), Username, Password, Confirm Password
+- All fields are required
+- Password must be strong: uppercase, lowercase, numbers, and symbols
+- **Edit User** opens a pre-filled form with a "Change Password" checkbox 
+  to optionally update the password
+- Filter options available: Username, User Role, Employee Name, Status 
+  (with Reset and Search buttons)
+
+### 2.2 Job
+Contains 5 sub-sections:
+
+**Job Titles**
+- Lists: Job Title, Job Description, Actions (Edit/Delete)
+- Add form requires: Job Title (required), Job Description, Job 
+  Specification (file upload, optional), Note
+
+**Pay Grades**
+- Lists pay grades, each linked to a currency. Has Add/Edit/Delete.
+- Add form only requires a Pay Grade name
+- ⚠️ Behavior note: after saving a new Pay Grade, it appears in the list 
+  WITHOUT a currency assigned. You must then edit it to add a currency 
+  via the "Currencies" section (shows currency, min salary, max salary)
+- Adding a currency requires only the currency itself (min/max salary optional)
+
+**Employment Status** — Simple list with Add/Edit/Delete
+**Job Categories** — Simple list with Add/Edit/Delete
+
+**Work Shifts**
+- Lists: Name, From, To, Hours per Day. Has Add/Edit/Delete
+- Add form requires: Shift Name (required), Working Hours 
+  [From/To/Duration per Day] (required), Assigned Employees (optional)
+
+### 2.3 Organization
+Contains 3 sub-sections:
+
+**General Information**
+- Displays company info in a form with an Edit toggle
+- Organization Name is the only required field
+
+**Locations**
+- Lists: Location Name, City, Country, Phone, Number of Employees
+- Has Add/Edit/Delete and filters (Name, City, Country)
+- Add form requires: Name (required), City, State/Province, Zip/Postal 
+  Code, Country (required, dropdown), Phone, Fax, Address, Notes
+
+**Structure**
+- Displays organization hierarchy
+- Has an Edit toggle to modify/add to the structure
+
+### 2.4 Qualifications
+Contains 5 sub-sections: Skills, Education, Licenses, Languages, Memberships
+
+- **Skills**: 21 predefined skills (e.g., Java, JIRA, Photoshop, SEO), each with 
+  a Name and Description/category (e.g., "Programming Language," "Graphic Design")
+- **Education**: 4 predefined levels — Bachelor's Degree, College Undergraduate, 
+  High School Diploma, Master's Degree. Has Add/Edit/Delete
+- **Licenses**: - **Licenses**: 6 predefined certification licenses (e.g., CDMP, CISM, CCNA, 
+  CCNP, MCSE, PMI-ACP). Has Add/Edit/Delete
+- **Languages**: 6 predefined languages (Arabic, Chinese, English, French, 
+  Russian, Spanish). Has Add/Edit/Delete
+- **Memberships**: 4 predefined professional memberships (ACCA, BCS, CIM, CIMA). 
+  Has Add/Edit/Delete
+
+### 2.5 Nationalities
+- A large reference list — 193 records (e.g., Afghan, Albanian, American...)
+- Has Add/Edit/Delete for each entry, paginated (4 pages)
+- Purpose: populates the "Nationality" dropdown used elsewhere (e.g., PIM personal details)
+
+### 2.6 Corporate Branding
+- Single settings page (no sub-tabs) for customizing the system's appearance
+- Fields: Primary/Secondary Color, Primary/Secondary Font Color, Primary Gradient 
+  Colors 1 & 2 (all marked required*)
+- File uploads: Client Logo, Client Banner, Login Banner — each with specific 
+  accepted formats (jpg, png, gif, svg) and file size limit (1MB), plus 
+  recommended pixel dimensions shown per upload
+- Toggle: Social Media Images (on/off)
+- Buttons: Reset to Default, Preview, Publish
+
+### 2.7 Configuration
+Contains 8 sub-sections:
+
+- **Email Configuration**: Mail Sent As address, SMTP/Sendmail selection, 
+  path to Sendmail, Send Test Mail toggle
+- **Email Subscriptions**: 5 notification types (Leave Applications, Approvals, 
+  Assignments, Cancellations, Rejections), each with a subscriber-assignment 
+  icon and an on/off toggle
+- **Localization**: Language dropdown (e.g., English - United States) and 
+  Date Format dropdown (e.g., yyyy-dd-mm)
+- **Language Packages**: 9 installed language packs (English, French, German, 
+  Dutch, Spanish x2, Chinese x2, Tamil), each with upload/download/translate/
+  delete action icons
+- **Modules**: Toggle switches to enable/disable each major module system-wide 
+  (Admin, PIM, Leave, Time, Recruitment, Performance, Directory, Maintenance, 
+  Mobile, Claim, Buzz) — ⚠️ note: Admin and PIM toggles appear visually 
+  "greyed"/disabled compared to the others, worth double-checking if these two 
+  can actually be turned off or are locked on by design
+- **Social Media Authentication**: [Provider List — no records found by default, 
+  can Add a provider]
+- **Register OAuth Client**: Lists registered OAuth clients — 1 default record 
+  ("OrangeHRM Mobile App", Enabled), Add/Edit/Delete
+- **LDAP Configuration**: Extensive form with Server Settings (Host, Port, 
+  Encryption, LDAP Implementation), Bind Settings (Distinguished Name, 
+  Password, Bind Anonymously toggle), User Lookup Settings (Base DN, Search 
+  Scope, User Name/Search Filter/Unique ID attributes), Data Mapping 
+  (OrangeHRM fields ↔ LDAP directory fields), and Additional Settings 
+  (Merge LDAP Users toggle, Sync Interval). Has a "Test Connection" button 
+  plus Save. Includes a warning about backing up the database before enabling
+
+---
+
+## 3. PIM
+PIM has 4 tabs: Configuration, Employee List, Add Employee, Reports
+
+### 3.1 Employee List
+- Filter fields: Employee Name, Employee Id, Employment Status, Include 
+  (dropdown, default "Current Employees Only"), Supervisor Name, Job Title, 
+  Sub Unit — with Reset/Search buttons
+- Columns: Id, First (& Middle) Name, Last Name, Job Title, Employment Status, 
+  Sub Unit, Supervisor, Actions (Edit/Delete) — most sortable (↕ icons)
+- 108 total employee records, paginated (3 pages)
+- ⚠️ Data inconsistency: most rows show empty Job Title/Employment Status/
+  Sub Unit columns, but some rows (e.g., "muser") have all three populated 
+  and no numeric Id — possibly a different creation path (linked to a login)
+- ⚠️ Environment note: shared public demo contains a lot of leftover/junk 
+  test data from other users — duplicate names (e.g., 4x "Urvi Sri", 3x 
+  "Rahul Das"), blank Ids, automated test entries (e.g., "PlaywrightPW..." 
+  prefix from browser automation tools), gibberish names. This is expected 
+  noise on a public demo, NOT an application defect. When executing my own 
+  test cases, I'll create clearly-named test employees (e.g., prefixed 
+  "QA_") to separate my data from this noise, and won't report pre-existing 
+  data as bugs I "found."
+- Potential test idea (to execute later, not yet confirmed): verify system 
+  behavior when deliberately creating two employees with identical First/
+  Last Name — does it allow, warn, or block duplicates?
+
+### 3.2 Add Employee
+- Fields: Employee Full Name (First*, Middle, Last) — Employee Full Name is 
+  marked required overall, though which specific sub-field is required isn't 
+  fully clear from the UI yet
+- Employee Id auto-generates (e.g., 0587) — editable
+- Photo upload: optional, accepts jpg/png/gif up to 1MB, recommended 
+  200x200px
+- "Create Login Details" toggle — presumably reveals username/password 
+  fields when turned on (not yet confirmed)
+
+### 3.3 Reports
+- Lists saved reports. 4 predefined: All Employee Sub Unit Hierarchy Report, 
+  Employee Contact Info Report, Employee Job Details, PIM Sample Report
+- Each has Delete/Edit/View(document) icons
+- "Add Report" opens a report builder: Report Name*, Selection Criteria 
+  (dropdown + add button), Include (Current Employees Only default), 
+  Display Fields (Select Display Field Group + Select Display Field, each 
+  with a + to add more)
+
+### 3.4 Configuration (light pass)
+Contains several sub-sections:
+
+- **Optional Fields**: Toggles to show/hide deprecated fields (Nick Name, 
+  Smoker, Military Service) and country-specific fields (SSN, SIN, US Tax 
+  Exemptions) in Personal Details
+- **Custom Fields**: Lists custom fields added to PIM screens (e.g., 
+  "Blood Type" - Dropdown, "Test_Field" - Text or Number, both on Personal 
+  Details screen). Shows "Remaining number of custom fields: 8" — implying 
+  a max limit of 10 total. Add form: Field Name*, Screen* (dropdown), 
+  Type* (dropdown)
+- **Data Import**: CSV bulk-upload for employees. On-screen rules: column 
+  order must not change, First/Last Name compulsory, dates in YYYY-MM-DD 
+  format, gender must be Male/Female if specified, max 100 records per 
+  file, downloadable sample CSV provided. Accepts files up to 1MB
+- **Reporting Methods**: Lists ways an employee can report to a supervisor — 
+  3 records: Direct, Indirect, Test_Reporting (leftover test entry). Add 
+  form: just a Name field
+- **Termination Reasons**: 11 predefined reasons (Resigned, Retired, 
+  Deceased, Laid-off, Dismissed, etc.) plus a leftover "Test_Termination" 
+  entry. Add form: just a Name field
+
+### 3.5 Individual Employee Profile (example: Sara Tencrady, ID 0103)
+Left-side tab menu: Personal Details, Contact Details, Emergency Contacts, 
+Dependents, Immigration, Job, Salary, Report-to, Qualifications, Memberships
+
+**Personal Details**
+- Employee Full Name (First*, Middle, Last), Employee Id, Other Id
+- Driver's License Number, License Expiry Date (date picker)
+- Nationality (dropdown), Marital Status (dropdown)
+- Date of Birth (date picker), Gender (radio: Male/Female)
+- Custom Fields section appears here too: Blood Type (dropdown), Test_Field 
+  (text) — confirms these custom fields from Admin Config actually render here
+- Attachments section: file upload table (Name, Description, Size, Type, 
+  Date Added, Added By, Actions)
+
+**Contact Details**
+- Address: Street 1, Street 2, City, State/Province, Zip/Postal Code, 
+  Country (dropdown)
+- Telephone: Home, Mobile, Work
+- Email: Work Email, Other Email
+- Has its own Add Attachment section (file + comment)
+
+**Emergency Contacts**
+- Save Emergency Contact form: Name*, Relationship*, Home Telephone, 
+  Mobile, Work Telephone
+- Assigned Emergency Contacts table below
+- Own Add Attachment section (consistent pattern with every other tab)
+
+**Dependents**
+- Add Dependent form: Name*, Relationship* (dropdown), Date of Birth
+- Assigned Dependents table below, plus its own Add Attachment section
+
+**Immigration**
+- Add Immigration form: Document type (radio: Passport/Visa), Number*, 
+  Issued Date, Expiry Date, Eligible Status, Issued By (dropdown), 
+  Eligible Review Date, Comments
+- Assigned Immigration Records table, plus Add Attachment section
+
+**Job**
+- Joined Date, Job Title (dropdown), Job Specification (shows "Not Defined" 
+  if none set)
+- Job Category (dropdown), Sub Unit (dropdown), Location (dropdown)
+- Employment Status (dropdown)
+- "Include Employment Contract Details" toggle — reveals Contract Start 
+  Date, Contract End Date, Contract Details (file upload)
+- "Terminate Employment" button (red) under a separate "Employee 
+  Termination/Activation" section
+- ⚠️ Date format quirk: Joined Date showed as "2015-29-10" — this matches 
+  the yyyy-dd-mm format set in Admin > Configuration > Localization, 
+  meaning it reads as day=29, month=10 (Oct 29, 2015). Worth testing: does 
+  the system correctly reject an invalid day/month combo if the format is 
+  changed, or if a user manually types a date that doesn't fit the active 
+  format?
+- Own Add Attachment section
+
+**Salary**
+- Add Salary Component form: Salary Component* (text), Pay Grade (dropdown), 
+  Pay Frequency (dropdown), Currency* (dropdown), Amount*, Comments
+- "Include Direct Deposit Details" toggle — reveals Account Number*, 
+  Account Type* (dropdown), Routing Number*, Amount*
+- Assigned Salary Components table, plus own Add Attachment section
+
+**Report-to**
+- Add Supervisor: Name* (autocomplete), Reporting Method* (dropdown) — 
+  Assigned Supervisors table below (this employee has 1: "manda user", 
+  Direct)
+- Add Subordinate: same structure (Name*, Reporting Method*) — Assigned 
+  Subordinates table
+- Own Add Attachment section
+- Note: confirms Reporting Methods (Direct/Indirect from Admin > PIM 
+  Configuration) are used here as a real dropdown
+
+**Qualifications**
+- Four sub-forms all on one page: 
+  - Work Experience (Company*, Job Title*, From, To, Comment)
+  - Education (Level*, Institute, Major/Specialization, Year, GPA/Score, 
+    Start/End Date)
+  - Skills (Skill* dropdown, Years of Experience, Comments) — confirms the 
+    21 Skills from Admin > Qualifications populate this dropdown
+  - Languages (Language* dropdown, Fluency* dropdown, Competency* dropdown, 
+    Comments) — confirms the 6 Languages from Admin populate this
+  - License (License Type* dropdown, License Number, Issued Date, Expiry 
+    Date) — confirms the 6 Licenses from Admin populate this
+- Each sub-section has its own Add/table, plus one shared Attachments 
+  section at the bottom
+
+**Memberships**
+- Add Membership form: Membership* (dropdown, populated from the 4 
+  Memberships in Admin), Subscription Paid By (dropdown), Subscription 
+  Amount, Currency (dropdown), Subscription Commence Date, Subscription 
+  Renewal Date
+- Assigned Memberships table, plus own Add Attachment section
+
+⚠️ Structural pattern across all Employee Profile tabs (Emergency Contacts, 
+Dependents, Immigration, Job, Salary, Report-to, Qualifications, 
+Memberships): each follows Add Form → Records Table → own Attachments 
+section. This consistency means test cases for "add a record," "required 
+field validation," and "attachment upload" will be structurally similar 
+across tabs — I can template one strong test case per pattern and adapt it, 
+rather than designing each tab's tests from scratch.
+
+---
+
+## 4. Leave
+Leave has 7 tabs: Apply, My Leave, Entitlements, Reports, Configure, 
+Leave List, Assign Leave
+
+### 4.1 Apply
+- Leave Type* (dropdown), Leave Balance (auto-displays, e.g., "0.00 Day(s)")
+- From Date*, To Date* (date pickers), Comments
+- "Apply" button submits the request
+
+### 4.2 My Leave
+- Filters: From Date, To Date, Show Leave with Status* (multi-select tags: 
+  Rejected, Cancelled, Pending Approval, Scheduled, Taken — all shown as 
+  removable chips), Leave Type
+- Table columns: Date, Employee Name, Leave Type, Leave Balance (Days), 
+  Number of Days, Status, Comments, Actions
+- Each pending row has a "Cancel" button plus a 3-dot menu for more actions
+- Confirms leave requests default to "Pending Approval" until acted on
+
+### 4.3 Entitlements
+- **Add Leave Entitlement**: "Add to" radio (Individual Employee / Multiple 
+  Employees)
+  - Individual: Employee Name* (autocomplete), Leave Type*, Leave Period* 
+    (dropdown), Entitlement* (days)
+  - Multiple Employees: Location (dropdown), Sub Unit (dropdown) — shows 
+    live match count (e.g., "matches (142) employees"), plus same Leave 
+    Type/Period/Entitlement fields
+- **My Leave Entitlements**: filter by Leave Type + Leave Period, shows a 
+  running "Total X Day(s)" and a table (Leave Type, Entitlement Type, 
+  Valid From, Valid To, Days, Actions)
+
+### 4.4 Reports
+- **Leave Entitlements and Usage Report**: "Generate For" radio (Leave 
+  Type / Employee)
+  - Leave Type mode: Leave Type* dropdown, Leave Period*, Location, Sub 
+    Unit, Job Title, "Include Past Employees" toggle
+  - Employee mode: Employee Name* (autocomplete), Leave Period*
+- **My Leave Entitlements and Usage Report**: just Leave Period* filter — 
+  generates a table with all 11 leave types as rows, columns: Leave 
+  Entitlements, Leave Pending Approval, Leave Scheduled, Leave Taken, 
+  Leave Balance (all in Days)
+- ⚠️ One row is labeled "Sick Leave (Deleted)" — confirms that deleting a 
+  Leave Type doesn't remove historical records referencing it; it just 
+  gets marked "(Deleted)" in reports. Good behavior to verify deliberately 
+  later.
+
+### 4.5 Configure
+Three sub-sections:
+- **Leave Period**: Start Month* (dropdown), Start Date* (dropdown) — End 
+  Date auto-calculates (shows "December 31"), Current Leave Period shown 
+  read-only
+- **Leave Types**: List of 10 leave types (CAN - Bereavement/FMLA/
+  Maternity/Personal/Vacation, US - Bereavement/FMLA/Maternity/Personal/
+  Vacation). Add form: Name*, "Is Entitlement Situational?" radio (Yes/No)
+- **Work Week**: Dropdown per day (Monday–Sunday), each set to Full Day / 
+  Non-working Day etc. Default: Mon–Fri Full Day, Sat/Sun Non-working Day
+- **Holidays**: 16 predefined holidays (New Year's Day, Christmas Day, 
+  several Canada/US-specific ones). Add form: Name*, Date*, Full Day/Half 
+  Day* dropdown, Repeats Annually radio (Yes/No)
+
+### 4.6 Leave List (admin view of all employees' leave)
+- Same filter structure as My Leave, plus Employee Name and Sub Unit 
+  filters, and "Include Past Employees" toggle
+- Same table structure as My Leave
+- 3-dot Actions menu reveals: Add Comment, View Leave Details, View PIM 
+  Info, Cancel Leave
+
+**View Leave Details** (opened from the 3-dot menu):
+- Shows the request broken down by individual day: Date, Leave Type, 
+  Leave Balance, Duration (Hours), Status, Comments, Actions
+- ⚠️ Confirms real business logic: a multi-day leave request spanning a 
+  weekend shows those weekend days with Status "Weekend" and Duration 
+  0.00 hours — meaning the system automatically excludes non-working days 
+  from the leave duration count rather than counting every calendar day. 
+  Good test case: "Verify weekend/non-working days within a leave date 
+  range are excluded from Duration and do not consume leave balance."
+- ⚠️ No visible Approve/Reject button anywhere in this view — only "Add 
+  Comment" and "Cancel Leave" per day, plus a top-level "Comments" button. 
+  This suggests approval happens through a different flow than explored 
+  so far (possibly requires being logged in as the employee's specific 
+  supervisor). Worth investigating only if Leave approval becomes a 
+  specific test case — not a documentation gap.
+
+**View PIM Info** (from the same menu):
+- Navigates directly to that employee's PIM Personal Details tab — 
+  confirms a working cross-module shortcut from Leave into PIM
+- ⚠️ Second confirmed instance of the date format bug — Date of Birth 
+  shows "2023-21-10" (day=21, month=10 under yyyy-dd-mm format). This is 
+  now the fourth separate screen (Leave List filter, a leave record, a 
+  Holiday record, and Date of Birth) showing a day value that would be 
+  invalid as a month — reinforcing this is a systemic display/validation 
+  issue tied to the Localization date format setting, not a one-off 
+  glitch.
+
+### 4.7 Assign Leave
+- Same form shape as Apply, but with an added Employee Name* field — this 
+  is how a manager/admin books leave on behalf of someone else
+- Employee Name*, Leave Type*, Leave Balance (auto), From Date*, To Date*, 
+  Comments, "Assign" button
+
+### Key findings for Leave
+⚠️ CONFIRMED BUG CANDIDATE: Invalid dates are being accepted and stored 
+system-wide due to the yyyy-dd-mm format setting.
+Evidence across 4 separate screens:
+- Leave List "To Date" filter: "2026-31-12"
+- A leave record date: "2026-28-08" (day=28, month=08)
+- Holiday "St. Patrick's Day (Canada)": "2026-16-03" — 16 cannot be a 
+  valid month, which is the clearest proof the field reads day-first 
+  without proper month validation
+- Employee Date of Birth: "2023-21-10" (day=21, month=10)
+This is a strong, well-evidenced candidate for a formal bug report once 
+tested deliberately (e.g., switching Localization date format and 
+checking whether validation catches inconsistent input).
