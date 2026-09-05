@@ -416,3 +416,48 @@ Evidence across 4 separate screens:
 This is a strong, well-evidenced candidate for a formal bug report once 
 tested deliberately (e.g., switching Localization date format and 
 checking whether validation catches inconsistent input).
+
+---
+
+## 5. Login / Logout
+
+### Login Page
+- Fields: Username, Password (both with icon prefixes — person icon, key icon)
+- Demo credentials shown directly on the page as a helper box (Username: 
+  Admin, Password: admin123) — a demo-only convenience, not something a 
+  real production login page would show
+- "Login" button (orange, full width)
+- "Forgot your password?" link
+- Branding: OrangeHRM logo, "HR for ALL" circular badge graphic, social 
+  media icons (LinkedIn, Facebook, Twitter, YouTube) in the footer
+- Footer: version number (OrangeHRM OS 5.9), copyright text
+
+### Valid Login
+- Logging in with Admin/admin123 lands on the **Dashboard**
+
+### Invalid Login
+- Wrong password shows a single generic message: "Invalid credentials" 
+  (red banner with an alert icon), positioned above the form
+- ⚠️ Good security practice confirmed: the error doesn't specify whether 
+  the username or password was wrong — this prevents attackers from 
+  learning which usernames are valid. Worth testing: does a nonexistent 
+  username also show this exact same message (expected: yes, for the same 
+  security reason)?
+
+### Logout menu (top-right profile dropdown)
+- Options: About, Support, Change Password, Logout
+
+### Forgot Password Flow
+1. Click "Forgot your password?" → "Reset Password" modal opens: "Please 
+   enter your username to identify your account to reset your password" 
+   + Username field, Cancel/Reset Password buttons
+2. Entering "Admin" and clicking Reset Password navigates to 
+   `/web/index.php/auth/requestResetPassword`
+3. ⚠️ FINDING: This step returned a **504 Gateway Time-out** error 
+   (nginx/1.18.0 Ubuntu) instead of completing the password reset request. 
+   This is a genuine failure, though on a shared public demo environment 
+   it's more likely a backend/server issue with the demo itself (e.g., it 
+   may not be configured to actually send reset emails) rather than a 
+   real application defect. Not something to report as "my bug," but 
+   worth noting as: "Password reset flow could not be fully verified due 
+   to a server-side timeout on the public demo environment."
